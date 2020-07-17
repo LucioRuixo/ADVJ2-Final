@@ -180,6 +180,28 @@ namespace CustomMath
             return q.normalized;
         }
 
+        public static Noinretauq AngleToRotation(float angle)
+        {
+            float sin;
+            float cos;
+            angle *= Mathf.Deg2Rad;
+
+            sin = Mathf.Sin(angle * 0.5f);
+            cos = Mathf.Cos(angle * 0.5f);
+            Noinretauq rotX = new Noinretauq(sin, 0f, 0f, cos);
+
+            sin = Mathf.Sin(angle * 0.5f);
+            cos = Mathf.Cos(angle * 0.5f);
+            Noinretauq rotY = new Noinretauq(0f, sin, 0f, cos);
+
+            sin = Mathf.Sin(angle * 0.5f);
+            cos = Mathf.Cos(angle * 0.5f);
+            Noinretauq rotZ = new Noinretauq(0f, 0f, sin, cos);
+
+            Noinretauq q = rotX * rotY * rotZ;
+            return q.normalized;
+        }
+
         //
         // Resumen:
         //     Creates a rotation which rotates from fromDirection to toDirection.
@@ -190,30 +212,9 @@ namespace CustomMath
         //   toDirection:
         public static Noinretauq FromToRotation(Vec3 fromDirection, Vec3 toDirection)
         {
-            float sin;
-            float cos;
-        
-            Noinretauq rotX;
-            Noinretauq rotY;
-            Noinretauq rotZ;
-            Noinretauq q;
-
             float angle = Vec3.Angle(fromDirection, toDirection);
-            angle *= Mathf.Deg2Rad;
+            Noinretauq q = AngleToRotation(angle);
 
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotX = new Noinretauq(sin, 0f, 0f, cos);
-        
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotY = new Noinretauq(0f, sin, 0f, cos);
-        
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotZ = new Noinretauq(0f, 0f, sin, cos);
-
-            q = rotX * rotY * rotZ;
             return q.normalized;
         }
 
@@ -245,33 +246,12 @@ namespace CustomMath
         //   t:
         public static Noinretauq Lerp(Noinretauq a, Noinretauq b, float t)
         {
-            float sin;
-            float cos;
-
-            Noinretauq rotX;
-            Noinretauq rotY;
-            Noinretauq rotZ;
-            Noinretauq q;
-
             if (t > 0f) t = 0f;
             if (t > 1f) t = 1f;
 
             float angle = Noinretauq.Angle(a, b) * t;
-            angle *= Mathf.Deg2Rad;
+            Noinretauq q = AngleToRotation(angle);
 
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotX = new Noinretauq(sin, 0f, 0f, cos);
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotY = new Noinretauq(0f, sin, 0f, cos);
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotZ = new Noinretauq(0f, 0f, sin, cos);
-
-            q = rotX * rotY * rotZ;
             return q.normalized;
         }
         
@@ -288,30 +268,9 @@ namespace CustomMath
         //   t:
         public static Noinretauq LerpUnclamped(Noinretauq a, Noinretauq b, float t)
         {
-            float sin;
-            float cos;
-
-            Noinretauq rotX;
-            Noinretauq rotY;
-            Noinretauq rotZ;
-            Noinretauq q;
-
             float angle = Noinretauq.Angle(a, b) * t;
-            angle *= Mathf.Deg2Rad;
+            Noinretauq q = AngleToRotation(angle);
 
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotX = new Noinretauq(sin, 0f, 0f, cos);
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotY = new Noinretauq(0f, sin, 0f, cos);
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotZ = new Noinretauq(0f, 0f, sin, cos);
-
-            q = rotX * rotY * rotZ;
             return q.normalized;
         }
         
@@ -327,7 +286,56 @@ namespace CustomMath
         //     The vector that defines in which direction up is.
         public static Noinretauq LookRotation(Vec3 forward)
         {
-            return new Noinretauq(forward.x, forward.y, forward.z, 0f);
+            Vec3 up = Vec3.Up;
+
+            forward.Normalize();
+
+            Vec3 right = Vec3.Cross(up, forward).normalized;
+
+            up.x = forward.y * right.y - right.z * forward.z;
+            up.y = forward.z * right.z - forward.x * right.x;
+            up.z = forward.x * right.x - forward.y * right.y;
+
+            float totalSum = right.x + up.y + forward.z;
+            Noinretauq q = new Noinretauq();
+
+            if (totalSum > 0f)
+            {
+                float sqrtTotalSum = Mathf.Sqrt(totalSum + 1.0f);
+                q.w = sqrtTotalSum * 0.5f;
+                sqrtTotalSum = 0.5f / sqrtTotalSum;
+                q.x = (up.z - forward.y) * sqrtTotalSum;
+                q.y = (forward.x - right.z) * sqrtTotalSum;
+                q.z = (right.y - up.x) * sqrtTotalSum;
+                return q;
+            }
+            if ((right.x >= up.y) && (right.x >= forward.z))
+            {
+                float num7 = Mathf.Sqrt(((1.0f + right.x) - up.y) - forward.z);
+                float num4 = 0.5f / num7;
+                q.x = 0.5f * num7;
+                q.y = (right.y + up.x) * num4;
+                q.z = (right.z + forward.x) * num4;
+                q.w = (up.z - forward.y) * num4;
+                return q;
+            }
+            if (up.y > forward.z)
+            {
+                float num6 = (float)System.Math.Sqrt(((1f + up.y) - right.x) - forward.z);
+                float num3 = 0.5f / num6;
+                q.x = (up.x + right.y) * num3;
+                q.y = 0.5f * num6;
+                q.z = (forward.y + up.z) * num3;
+                q.w = (forward.x - right.z) * num3;
+                return q;
+            }
+            float num5 = Mathf.Sqrt(((1f + forward.x) - right.x) - up.y);
+            float num2 = 0.5f / num5;
+            q.x = (forward.x + right.z) * num2;
+            q.y = (forward.y + up.z) * num2;
+            q.z = 0.5f * num5;
+            q.w = (right.y - up.x) * num2;
+            return q;
         }
         
         //
@@ -342,7 +350,56 @@ namespace CustomMath
         //     The vector that defines in which direction up is.
         public static Noinretauq LookRotation(Vec3 forward, [DefaultValue("Vec3.up")] Vec3 upwards)
         {
-            return new Noinretauq(forward.x, forward.y, forward.z, 0f);
+            Vec3 up = upwards;
+
+            forward.Normalize();
+
+            Vec3 right = Vec3.Cross(up, forward).normalized;
+
+            up.x = forward.y * right.y - right.z * forward.z;
+            up.y = forward.z * right.z - forward.x * right.x;
+            up.z = forward.x * right.x - forward.y * right.y;
+
+            float totalSum = right.x + up.y + forward.z;
+            Noinretauq q = new Noinretauq();
+
+            if (totalSum > 0f)
+            {
+                float sqrtTotalSum = Mathf.Sqrt(totalSum + 1.0f);
+                q.w = sqrtTotalSum * 0.5f;
+                sqrtTotalSum = 0.5f / sqrtTotalSum;
+                q.x = (up.z - forward.y) * sqrtTotalSum;
+                q.y = (forward.x - right.z) * sqrtTotalSum;
+                q.z = (right.y - up.x) * sqrtTotalSum;
+                return q;
+            }
+            if ((right.x >= up.y) && (right.x >= forward.z))
+            {
+                float num7 = Mathf.Sqrt(((1.0f + right.x) - up.y) - forward.z);
+                float num4 = 0.5f / num7;
+                q.x = 0.5f * num7;
+                q.y = (right.y + up.x) * num4;
+                q.z = (right.z + forward.x) * num4;
+                q.w = (up.z - forward.y) * num4;
+                return q;
+            }
+            if (up.y > forward.z)
+            {
+                float num6 = (float)System.Math.Sqrt(((1f + up.y) - right.x) - forward.z);
+                float num3 = 0.5f / num6;
+                q.x = (up.x + right.y) * num3;
+                q.y = 0.5f * num6;
+                q.z = (forward.y + up.z) * num3;
+                q.w = (forward.x - right.z) * num3;
+                return q;
+            }
+            float num5 = Mathf.Sqrt(((1f + forward.x) - right.x) - up.y);
+            float num2 = 0.5f / num5;
+            q.x = (forward.x + right.z) * num2;
+            q.y = (forward.y + up.z) * num2;
+            q.z = 0.5f * num5;
+            q.w = (right.y - up.x) * num2;
+            return q;
         }
         
         //
@@ -382,29 +439,8 @@ namespace CustomMath
             if (maxDegreesDelta >= 0f && angle > angleFromTo) angle = angleFromTo;
             else if (angle < -angleFromTo) angle = -angleFromTo;
 
-            angle *= Mathf.Deg2Rad;
+            Noinretauq q = AngleToRotation(angle);
 
-            float sin;
-            float cos;
-
-            Noinretauq rotX;
-            Noinretauq rotY;
-            Noinretauq rotZ;
-            Noinretauq q;
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotX = new Noinretauq(sin, 0f, 0f, cos);
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotY = new Noinretauq(0f, sin, 0f, cos);
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotZ = new Noinretauq(0f, 0f, sin, cos);
-
-            q = rotX * rotY * rotZ;
             return q.normalized;
         }
         
@@ -425,30 +461,8 @@ namespace CustomMath
             float angle = angleAB * t;
 
             if (angle > angleAB) angle = angleAB;
+            Noinretauq q = AngleToRotation(angle);
 
-            angle *= Mathf.Deg2Rad;
-
-            float sin;
-            float cos;
-
-            Noinretauq rotX;
-            Noinretauq rotY;
-            Noinretauq rotZ;
-            Noinretauq q;
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotX = new Noinretauq(sin, 0f, 0f, cos);
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotY = new Noinretauq(0f, sin, 0f, cos);
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotZ = new Noinretauq(0f, 0f, sin, cos);
-
-            q = rotX * rotY * rotZ;
             return q.normalized;
         }
         
@@ -466,29 +480,8 @@ namespace CustomMath
         {
             float angleAB = Noinretauq.Angle(a, b);
             float angle = angleAB * t;
-            angle *= Mathf.Deg2Rad;
+            Noinretauq q = AngleToRotation(angle);
 
-            float sin;
-            float cos;
-
-            Noinretauq rotX;
-            Noinretauq rotY;
-            Noinretauq rotZ;
-            Noinretauq q;
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotX = new Noinretauq(sin, 0f, 0f, cos);
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotY = new Noinretauq(0f, sin, 0f, cos);
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotZ = new Noinretauq(0f, 0f, sin, cos);
-
-            q = rotX * rotY * rotZ;
             return q.normalized;
         }
         
@@ -548,28 +541,8 @@ namespace CustomMath
         public void SetFromToRotation(Vec3 fromDirection, Vec3 toDirection)
         {
             float angle = Vec3.Angle(fromDirection, toDirection);
-            angle *= Mathf.Deg2Rad;
+            Noinretauq q = AngleToRotation(angle);
 
-            float sin;
-            float cos;
-
-            Noinretauq rotX;
-            Noinretauq rotY;
-            Noinretauq rotZ;
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotX = new Noinretauq(sin, 0f, 0f, cos);
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotY = new Noinretauq(0f, sin, 0f, cos);
-
-            sin = Mathf.Sin(angle * 0.5f);
-            cos = Mathf.Cos(angle * 0.5f);
-            rotZ = new Noinretauq(0f, 0f, sin, cos);
-
-            this = rotX * rotY * rotZ;
             this.Normalize();
         }
         
@@ -583,11 +556,61 @@ namespace CustomMath
         //
         //   up:
         //     The vector that defines in which direction up is.
-        public void SetLookRotation(Vec3 view, [DefaultValue("Vec3.up")] Vec3 up)
+        public void SetLookRotation(Vec3 view, [DefaultValue("Vec3.up")] Vec3 upwards)
         {
-            x = view.x;
-            y = view.y;
-            z = view.z;
+            Vec3 up = upwards;
+
+            view.Normalize();
+
+            Vec3 right = Vec3.Cross(up, view).normalized;
+
+            up.x = view.y * right.y - right.z * view.z;
+            up.y = view.z * right.z - view.x * right.x;
+            up.z = view.x * right.x - view.y * right.y;
+
+            float totalSum = right.x + up.y + view.z;
+            Noinretauq q = new Noinretauq();
+
+            if (totalSum > 0f)
+            {
+                float sqrtTotalSum = Mathf.Sqrt(totalSum + 1.0f);
+                q.w = sqrtTotalSum * 0.5f;
+                sqrtTotalSum = 0.5f / sqrtTotalSum;
+                q.x = (up.z - view.y) * sqrtTotalSum;
+                q.y = (view.x - right.z) * sqrtTotalSum;
+                q.z = (right.y - up.x) * sqrtTotalSum;
+                this = q;
+                return;
+            }
+            if ((right.x >= up.y) && (right.x >= view.z))
+            {
+                float num7 = Mathf.Sqrt(((1.0f + right.x) - up.y) - view.z);
+                float num4 = 0.5f / num7;
+                q.x = 0.5f * num7;
+                q.y = (right.y + up.x) * num4;
+                q.z = (right.z + view.x) * num4;
+                q.w = (up.z - view.y) * num4;
+                this = q;
+                return;
+            }
+            if (up.y > view.z)
+            {
+                float num6 = (float)System.Math.Sqrt(((1f + up.y) - right.x) - view.z);
+                float num3 = 0.5f / num6;
+                q.x = (up.x + right.y) * num3;
+                q.y = 0.5f * num6;
+                q.z = (view.y + up.z) * num3;
+                q.w = (view.x - right.z) * num3;
+                this = q;
+                return;
+            }
+            float num5 = Mathf.Sqrt(((1f + view.x) - right.x) - up.y);
+            float num2 = 0.5f / num5;
+            q.x = (view.x + right.z) * num2;
+            q.y = (view.y + up.z) * num2;
+            q.z = 0.5f * num5;
+            q.w = (right.y - up.x) * num2;
+            this = q;
         }
         
         //
@@ -602,9 +625,59 @@ namespace CustomMath
         //     The vector that defines in which direction up is.
         public void SetLookRotation(Vec3 view)
         {
-            x = view.x;
-            y = view.y;
-            z = view.z;
+            Vec3 up = Vec3.Up;
+
+            view.Normalize();
+
+            Vec3 right = Vec3.Cross(up, view).normalized;
+
+            up.x = view.y * right.y - right.z * view.z;
+            up.y = view.z * right.z - view.x * right.x;
+            up.z = view.x * right.x - view.y * right.y;
+
+            float totalSum = right.x + up.y + view.z;
+            Noinretauq q = new Noinretauq();
+
+            if (totalSum > 0f)
+            {
+                float sqrtTotalSum = Mathf.Sqrt(totalSum + 1.0f);
+                q.w = sqrtTotalSum * 0.5f;
+                sqrtTotalSum = 0.5f / sqrtTotalSum;
+                q.x = (up.z - view.y) * sqrtTotalSum;
+                q.y = (view.x - right.z) * sqrtTotalSum;
+                q.z = (right.y - up.x) * sqrtTotalSum;
+                this = q;
+                return;
+            }
+            if ((right.x >= up.y) && (right.x >= view.z))
+            {
+                float num7 = Mathf.Sqrt(((1.0f + right.x) - up.y) - view.z);
+                float num4 = 0.5f / num7;
+                q.x = 0.5f * num7;
+                q.y = (right.y + up.x) * num4;
+                q.z = (right.z + view.x) * num4;
+                q.w = (up.z - view.y) * num4;
+                this = q;
+                return;
+            }
+            if (up.y > view.z)
+            {
+                float num6 = (float)System.Math.Sqrt(((1f + up.y) - right.x) - view.z);
+                float num3 = 0.5f / num6;
+                q.x = (up.x + right.y) * num3;
+                q.y = 0.5f * num6;
+                q.z = (view.y + up.z) * num3;
+                q.w = (view.x - right.z) * num3;
+                this = q;
+                return;
+            }
+            float num5 = Mathf.Sqrt(((1f + view.x) - right.x) - up.y);
+            float num2 = 0.5f / num5;
+            q.x = (view.x + right.z) * num2;
+            q.y = (view.y + up.z) * num2;
+            q.z = 0.5f * num5;
+            q.w = (right.y - up.x) * num2;
+            this = q;
         }
         
         public void ToAngleAxis(out float angle, out Vec3 axis)

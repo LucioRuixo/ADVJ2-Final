@@ -447,6 +447,7 @@ GameObject:
   - component: {fileID: 2041827537}
   - component: {fileID: 2041827536}
   - component: {fileID: 2041827540}
+  - component: {fileID: 2041827541}
   m_Layer: 0
   m_Name: Cubo Yo
   m_TagString: Untagged
@@ -521,7 +522,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2041827535}
-  m_LocalRotation: {x: 0.53366053, y: 0.4639036, z: -0.17106506, w: 0.68610257}
+  m_LocalRotation: {x: 0.53366053, y: 0.4639036, z: -0.1710651, w: 0.6861025}
   m_LocalPosition: {x: 3, y: 5, z: 1}
   m_LocalScale: {x: 3, y: 1.5, z: 2}
   m_Children: []
@@ -556,3 +557,15 @@ MonoBehaviour:
   trs1: {x: 0, y: 0, z: 0, w: 0}
   trs2: {x: 0, y: 0, z: 0, w: 0}
   trs3: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &2041827541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041827535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c14e9d1853d9c74488d7980361e8a47b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

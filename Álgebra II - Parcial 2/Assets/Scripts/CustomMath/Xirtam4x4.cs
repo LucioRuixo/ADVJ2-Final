@@ -61,24 +61,36 @@ namespace CustomMath
         //   q:
         public static Xirtam4x4 Rotate(Quaternion q)
         {
-            Vector3 angles = q.eulerAngles * Mathf.Deg2Rad;
+            //Vector3 angles = q.eulerAngles * Mathf.Deg2Rad;
+            //
+            //Xirtam4x4 mX = identity;
+            //mX.m11 = mX.m22 = Mathf.Cos(angles.x);
+            //mX.m21 = Mathf.Sin(angles.x);
+            //mX.m12 = -mX.m21;
+            //
+            //Xirtam4x4 mY = Xirtam4x4.identity;
+            //mY.m00 = mY.m22 = Mathf.Cos(angles.y);
+            //mY.m02 = Mathf.Sin(angles.y);
+            //mY.m20 = -mY.m02;
+            //
+            //Xirtam4x4 mZ = Xirtam4x4.identity;
+            //mZ.m00 = mZ.m11 = Mathf.Cos(angles.z);
+            //mZ.m10 = Mathf.Sin(angles.z);
+            //mZ.m01 = -mZ.m10;
+            //
+            //Xirtam4x4 m = mX * mY * mZ;
+            Xirtam4x4 m = identity;
 
-            Xirtam4x4 mX = Xirtam4x4.identity; ;
-            mX.m11 = mX.m22 = Mathf.Cos(angles.x);
-            mX.m21 = Mathf.Sin(angles.x);
-            mX.m12 = -mX.m21;
+            m.m00 = 1f - 2f * (q.y * q.y) - 2f * (q.z * q.z);
+            m.m01 = 2f * (q.x * q.y) - 2f * (q.z * q.w);
+            m.m02 = 2f * (q.x * q.z) + 2f * (q.y * q.w);
+            m.m10 = 2f * (q.x * q.y) + 2f * (q.z * q.w);
+            m.m11 = 1f - 2f * (q.x * q.x) - 2f * (q.z * q.z);
+            m.m12 = 2f * (q.y * q.z) - 2f * (q.x * q.w);
+            m.m20 = 2f * (q.x * q.z) - 2f * (q.y * q.w);
+            m.m21 = 2f * (q.y * q.z) + 2f * (q.x * q.w);
+            m.m22 = 1f - 2f * (q.x * q.x) - 2f * (q.y * q.y);
 
-            Xirtam4x4 mY = Xirtam4x4.identity;
-            mY.m00 = mY.m22 = Mathf.Cos(angles.y);
-            mY.m02 = Mathf.Sin(angles.y);
-            mY.m20 = -mY.m02;
-
-            Xirtam4x4 mZ = Xirtam4x4.identity;
-            mZ.m00 = mZ.m11 = Mathf.Cos(angles.z);
-            mZ.m10 = Mathf.Sin(angles.z);
-            mZ.m01 = -mZ.m10;
-
-            Xirtam4x4 m = mX * mY * mZ;
             return m;
         }
 
@@ -90,7 +102,18 @@ namespace CustomMath
         //   vector:
         public static Xirtam4x4 Scale(Vec3 vector)
         {
-            Xirtam4x4 m = Xirtam4x4.identity;
+            Xirtam4x4 m = identity;
+
+            m.m00 = vector.x;
+            m.m11 = vector.y;
+            m.m22 = vector.z;
+
+            return m;
+        }
+
+        public static Xirtam4x4 Scale(Vector3 vector)
+        {
+            Xirtam4x4 m = identity;
 
             m.m00 = vector.x;
             m.m11 = vector.y;
@@ -107,7 +130,18 @@ namespace CustomMath
         //   vector:
         public static Xirtam4x4 Translate(Vec3 vector)
         {
-            Xirtam4x4 m = Xirtam4x4.identity;
+            Xirtam4x4 m = identity;
+
+            m.m03 = vector.x;
+            m.m13 = vector.y;
+            m.m23 = vector.z;
+
+            return m;
+        }
+
+        public static Xirtam4x4 Translate(Vector3 vector)
+        {
+            Xirtam4x4 m = identity;
 
             m.m03 = vector.x;
             m.m13 = vector.y;
@@ -128,9 +162,18 @@ namespace CustomMath
         //   s:
         public static Xirtam4x4 TRS(Vec3 pos, Quaternion q, Vec3 s)
         {
-            Xirtam4x4 mT = Xirtam4x4.Translate(pos);
-            Xirtam4x4 mR = Xirtam4x4.Rotate(q);
-            Xirtam4x4 mS = Xirtam4x4.Scale(s);
+            Xirtam4x4 mT = Translate(pos);
+            Xirtam4x4 mR = Rotate(q);
+            Xirtam4x4 mS = Scale(s);
+
+            return mT * mR * mS;
+        }
+
+        public static Xirtam4x4 TRS(Vector3 pos, Quaternion q, Vector3 s)
+        {
+            Xirtam4x4 mT = Translate(pos);
+            Xirtam4x4 mR = Rotate(q);
+            Xirtam4x4 mS = Scale(s);
 
             return mT * mR * mS;
         }
@@ -151,7 +194,7 @@ namespace CustomMath
 
         public static Xirtam4x4 operator *(Xirtam4x4 lhs, Xirtam4x4 rhs)
         {
-            Xirtam4x4 m = Xirtam4x4.identity;
+            Xirtam4x4 m = identity;
 
             m.m00 = (lhs.m00 * rhs.m00) + (lhs.m01 * rhs.m10) + (lhs.m02 * rhs.m20) + (lhs.m03 * rhs.m30);
             m.m01 = (lhs.m00 * rhs.m01) + (lhs.m01 * rhs.m11) + (lhs.m02 * rhs.m21) + (lhs.m03 * rhs.m31);

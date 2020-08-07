@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using MathDebbuger;
 using CustomMath;
+using System.Collections.Generic;
 
 public class Ejercicio_Quaternion : MonoBehaviour
 {
@@ -25,13 +26,10 @@ public class Ejercicio_Quaternion : MonoBehaviour
     Transform E3_2;
     Transform E3_3;
 
-    Quaternion rotacionE1;
-    Quaternion rotacionE2_1;
-    Quaternion rotacionE2_2;
-    Quaternion rotacionE2_3;
-    Quaternion rotacionE3_1;
-    Quaternion rotacionE3_2;
-    Quaternion rotacionE3_3;
+    Quaternion rotacion;
+
+    List<Vector3> E2;
+    List<Vector3> E3;
 
     void Start()
     {
@@ -39,34 +37,37 @@ public class Ejercicio_Quaternion : MonoBehaviour
 
         E1 = Instantiate(go, transform).transform;
         E2_1 = Instantiate(go, transform).transform;
-        E2_2 = Instantiate(go, E2_1.transform.forward, Quaternion.identity, E2_1).transform;
-        E2_3 = Instantiate(go, E2_2.transform.forward, Quaternion.identity, E2_2).transform;
+        E2_2 = Instantiate(go, E2_1).transform;
+        E2_3 = Instantiate(go, E2_2).transform;
         E3_1 = Instantiate(go, transform).transform;
-        E3_2 = Instantiate(go, E3_1.transform.forward, Quaternion.identity, E3_1).transform;
-        E3_3 = Instantiate(go, E3_2.transform.forward, Quaternion.identity, E3_2).transform;
+        E3_2 = Instantiate(go, E3_1).transform;
+        E3_3 = Instantiate(go, E3_2).transform;
 
-        rotacionE1 = Quaternion.AngleAxis(angle, new Vec3(E1.up));
-        rotacionE2_1 = Quaternion.AngleAxis(angle, new Vec3(E2_1.up));
-        rotacionE2_2 = Quaternion.AngleAxis(angle, new Vec3(E2_2.up));
-        rotacionE2_3 = Quaternion.AngleAxis(angle, new Vec3(E2_3.up));
-        rotacionE3_1 = Quaternion.AngleAxis(angle, new Vec3(E3_1.up));
-        rotacionE3_2 = Quaternion.AngleAxis(angle, new Vec3(E3_2.up));
-        rotacionE3_3 = Quaternion.AngleAxis(angle, new Vec3(E3_3.up));
+        E2_2.rotation *= Quaternion.AngleAxis(-90f, E2_2.right);
+
+        rotacion = Quaternion.AngleAxis(angle, new Vec3(E1.up));
+
+        E2 = new List<Vector3>();
+        E2.Add(Vector3.zero);
+        E2.Add(E2_1.transform.forward * 10f);
+        E2.Add(E2_1.transform.forward * 10f + E2_2.transform.forward * 10f);
+        E2.Add(E2_1.transform.forward * 10f + E2_2.transform.forward * 10f + E2_3.transform.forward * 10f);
+
+        E3 = new List<Vector3>();
+        E3.Add(Vector3.zero);
+        E3.Add(E3_1.transform.forward * 10f);
+        E3.Add(E3_1.transform.forward * 10f + E3_2.transform.forward * 10f);
+        E3.Add(E3_1.transform.forward * 10f + E3_2.transform.forward * 10f + E3_3.transform.forward * 10f);
 
         VectorDebugger.EnableCoordinates();
         VectorDebugger.AddVector(E1.forward, Color.red, "E1");
-        VectorDebugger.AddVector(E2_1.forward, Color.yellow, "E2_1");
-        VectorDebugger.AddVector(E2_2.forward, Color.yellow, "E2_2");
-        VectorDebugger.AddVector(E2_3.forward, Color.yellow, "E2_3");
-        VectorDebugger.AddVector(E3_1.forward, Color.blue, "E3_1");
-        VectorDebugger.AddVector(E3_2.forward, Color.blue, "E3_2");
-        VectorDebugger.AddVector(E3_3.forward, Color.blue, "E3_3");
+        VectorDebugger.AddVectorsSecuence(E2, true, Color.blue, "E2");
+        VectorDebugger.AddVectorsSecuence(E3, true, Color.yellow, "E3");
         VectorDebugger.EnableEditorView();
     }
 
     void Update()
     {
-        Debug.Log(ejercicio);
         if (ultimoEjercicio != ejercicio)
         {
             ActivarEjercicio();
@@ -77,27 +78,33 @@ public class Ejercicio_Quaternion : MonoBehaviour
         {
             case Ejercicios.Uno:
                 {
-                    E1.rotation *= rotacionE1;
+                    E1.rotation *= rotacion;
 
-                    MathDebbuger.VectorDebugger.UpdatePosition("E1", E1.forward * 10f);
+                    VectorDebugger.UpdatePosition("E1", E1.forward * 10f);
                     break;
                 }
             case Ejercicios.Dos:
                 {
+                    E2_1.rotation *= rotacion;
+                    E2_3.rotation = E2_1.rotation;
 
+                    E2[1] = E2_1.transform.forward * 10f;
+                    E2[2] = E2_1.transform.forward * 10f + E2_2.transform.forward * 10f;
+                    E2[3] = E2_1.transform.forward * 10f + E2_2.transform.forward * 10f + E2_3.transform.forward * 10f;
 
-                    MathDebbuger.VectorDebugger.UpdatePosition("E2_1", E2_1.forward);
-                    MathDebbuger.VectorDebugger.UpdatePosition("E2_2", E2_2.forward);
-                    MathDebbuger.VectorDebugger.UpdatePosition("E2_3", E2_3.forward);
+                    VectorDebugger.UpdatePositionsSecuence("E2", E2);
                     break;
                 }
             case Ejercicios.Tres:
                 {
+                    E3_1.rotation *= rotacion;
+                    E3_3.rotation = E3_1.rotation;
 
+                    E3[1] = E3_1.transform.forward * 10f;
+                    E3[2] = E3_1.transform.forward * 10f + E3_2.transform.forward * 10f;
+                    E3[3] = E3_1.transform.forward * 10f + E3_2.transform.forward * 10f + E3_3.transform.forward * 10f;
 
-                    MathDebbuger.VectorDebugger.UpdatePosition("E3_1", E3_1.forward);
-                    MathDebbuger.VectorDebugger.UpdatePosition("E3_2", E3_2.forward);
-                    MathDebbuger.VectorDebugger.UpdatePosition("E3_3", E3_3.forward);
+                    VectorDebugger.UpdatePositionsSecuence("E3", E3);
                     break;
                 }
         }
@@ -110,36 +117,24 @@ public class Ejercicio_Quaternion : MonoBehaviour
             case Ejercicios.Uno:
                 {
                     VectorDebugger.TurnOnVector("E1");
-                    VectorDebugger.TurnOffVector("E2_1");
-                    VectorDebugger.TurnOffVector("E2_2");
-                    VectorDebugger.TurnOffVector("E2_3");
-                    VectorDebugger.TurnOffVector("E3_1");
-                    VectorDebugger.TurnOffVector("E3_2");
-                    VectorDebugger.TurnOffVector("E3_3");
+                    VectorDebugger.TurnOffVector("E2");
+                    VectorDebugger.TurnOffVector("E3");
 
                     break;
                 }
             case Ejercicios.Dos:
                 {
                     VectorDebugger.TurnOffVector("E1");
-                    VectorDebugger.TurnOnVector("E2_1");
-                    VectorDebugger.TurnOnVector("E2_2");
-                    VectorDebugger.TurnOnVector("E2_3");
-                    VectorDebugger.TurnOffVector("E3_1");
-                    VectorDebugger.TurnOffVector("E3_2");
-                    VectorDebugger.TurnOffVector("E3_3");
+                    VectorDebugger.TurnOnVector("E2");
+                    VectorDebugger.TurnOffVector("E3");
 
                     break;
                 }
             case Ejercicios.Tres:
                 {
                     VectorDebugger.TurnOffVector("E1");
-                    VectorDebugger.TurnOffVector("E2_1");
-                    VectorDebugger.TurnOffVector("E2_2");
-                    VectorDebugger.TurnOffVector("E2_3");
-                    VectorDebugger.TurnOnVector("E3_1");
-                    VectorDebugger.TurnOnVector("E3_2");
-                    VectorDebugger.TurnOnVector("E3_3");
+                    VectorDebugger.TurnOffVector("E2");
+                    VectorDebugger.TurnOnVector("E3");
 
                     break;
                 }

@@ -195,7 +195,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &687382525
 GameObject:
@@ -207,7 +207,7 @@ GameObject:
   m_Component:
   - component: {fileID: 687382526}
   m_Layer: 0
-  m_Name: Ejercicios
+  m_Name: Ejercicios Quaternion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -351,7 +351,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ejercicio: 0
-  angle: 0
+  angle: 1
 --- !u!4 &821700049
 Transform:
   m_ObjectHideFlags: 0
@@ -449,6 +449,38 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1618920082
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1618920083}
+  m_Layer: 0
+  m_Name: Ejercicio Matriz 4x4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1618920083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1618920082}
+  m_LocalRotation: {x: -0, y: -0, z: 0.000000014901161, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1942855964}
+  - {fileID: 2041827539}
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1942855960
 GameObject:
   m_ObjectHideFlags: 0
@@ -535,12 +567,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1942855960}
-  m_LocalRotation: {x: 0.53366053, y: 0.4639036, z: -0.17106514, w: 0.6861025}
+  m_LocalRotation: {x: 0.53366053, y: 0.4639036, z: -0.17106512, w: 0.6861025}
   m_LocalPosition: {x: 3, y: 5, z: 1}
-  m_LocalScale: {x: 3, y: 1.5, z: 2}
+  m_LocalScale: {x: 3, y: 1.5000002, z: 2}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_Father: {fileID: 1618920083}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 63, y: 90, z: 35}
 --- !u!1 &2041827535
 GameObject:
@@ -629,12 +661,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2041827535}
-  m_LocalRotation: {x: 0.53366053, y: 0.4639036, z: -0.1710651, w: 0.6861025}
+  m_LocalRotation: {x: 0.53366053, y: 0.4639036, z: -0.17106515, w: 0.6861025}
   m_LocalPosition: {x: 3, y: 5, z: 1}
-  m_LocalScale: {x: 3, y: 1.5, z: 2}
+  m_LocalScale: {x: 3, y: 1.4999998, z: 2}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_Father: {fileID: 1618920083}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 63, y: 90, z: 35}
 --- !u!114 &2041827540
 MonoBehaviour:

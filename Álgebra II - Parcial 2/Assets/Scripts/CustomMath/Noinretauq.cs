@@ -753,7 +753,11 @@ namespace CustomMath
         {
             return Noinretauq.Angle(lhs, rhs) < 0.001f ? false : true;
         }
-        
+
+        public static implicit operator Quaternion(Noinretauq q)
+        {
+            return new Quaternion(q.x, q.y, q.z, q.w);
+        }
         #endregion
     }
 }
